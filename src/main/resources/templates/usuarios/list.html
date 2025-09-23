@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuários - Lista</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<h1>Usuários</h1>
+
+<p th:if="${msg}" th:text="${msg}" style="color: green;"></p>
+
+<p>
+    <a th:href="@{/usuarios/ui/novo}">Novo usuário</a> |
+    <a th:href="@{/usuarios}">API JSON</a>
+</p>
+
+<table border="1" cellpadding="6" cellspacing="0">
+    <thead>
+    <tr>
+        <th>CPF</th>
+        <th>Nome</th>
+        <th>Data Nasc.</th>
+        <th>CEP</th>
+        <th>Placa</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="u : ${usuarios}">
+        <td th:text="${u.cpf}">cpf</td>
+        <td th:text="${u.nome}">nome</td>
+        <td th:text="${#dates.format(u.dataNascimento, 'yyyy-MM-dd')}">data</td>
+        <td th:text="${u.endereco != null ? u.endereco.cep : ''}">cep</td>
+        <td th:text="${u.placa != null ? u.placa.placa : ''}">placa</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

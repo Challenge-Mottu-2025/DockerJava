@@ -64,5 +64,3 @@ Lembrete: Para fazer o cadastro de funcionários, você precisa alterar o métod
 João Broggine - https://www.linkedin.com/in/joaobroggine/ | joaovitorbrogginelopes@gmail.com
 
 João Vitor Cândido - https://www.linkedin.com/in/jvictor0507/
-
-Lavinia Park - https://github.com/laviniapark
