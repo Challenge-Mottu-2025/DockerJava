@@ -61,13 +61,14 @@ public class UsuarioController {
         return ResponseEntity.ok(listaDeUsuarios);
     }
 
+    @GetMapping("/{cpf}")
     public ResponseEntity pegarPeloCpf(@PathVariable(value = "cpf")  String cpf) {
         Optional<Usuario> usuario = cachingService.findById(cpf);
 
         if(usuario.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encotrado.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.");
         } else {
-            return ResponseEntity.status(HttpStatus.FOUND).body(usuario);
+            return ResponseEntity.ok(usuario.get());
         }
     }
 
@@ -87,7 +88,6 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(usuario));
     }
 
-
     @DeleteMapping("/{cpf}")
     public ResponseEntity deletar(@PathVariable(value = "cpf") String cpf) {
         Optional<Usuario> usuario = repository.findById(cpf);
@@ -95,7 +95,7 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado para deletar.");
         }
         repository.delete(usuario.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Usuário deletado com sucesso.");
+        return ResponseEntity.ok("Usuário deletado com sucesso.");
     }
 
     @PutMapping("/{cpf}")
@@ -106,10 +106,10 @@ public class UsuarioController {
         }
         var usuarioAtualizado = usuario.get();
         BeanUtils.copyProperties(dto, usuarioAtualizado);
-        return ResponseEntity.status(HttpStatus.OK).body(repository.save(usuarioAtualizado));
+        return ResponseEntity.ok(repository.save(usuarioAtualizado));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class) // Metodo de prevenção de erro do @Valid
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->

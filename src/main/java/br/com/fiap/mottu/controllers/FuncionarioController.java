@@ -79,12 +79,12 @@ public class FuncionarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity peguePeloId(@PathVariable(value = "id")  UUID id) {
-        Optional funcionario = cachingService.findById(id);
+    public ResponseEntity peguePeloId(@PathVariable(value = "id")  Long id) {
+        Optional<Funcionario> funcionario = cachingService.findById(id);
         if (funcionario.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário não encontrado.");
         } else {
-            return ResponseEntity.status(HttpStatus.FOUND).body(funcionario);
+            return ResponseEntity.status(HttpStatus.FOUND).body(funcionario.get());
         }
     }
 
@@ -92,11 +92,12 @@ public class FuncionarioController {
     public ResponseEntity cadastro(@RequestBody @Valid FuncionarioDTO dto) {
         var funcionario = new Funcionario();
         BeanUtils.copyProperties(dto, funcionario);
+        // BeanUtils copiará nome, cpf, senha e cep (pois o DTO agora tem 'cep' component)
         return ResponseEntity.status(HttpStatus.CREATED).body(repositorio.save(funcionario));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deletar(@PathVariable(value = "id")  UUID id) {
+    public ResponseEntity deletar(@PathVariable(value = "id")  Long id) {
         Optional<Funcionario> funcionario = repositorio.findById(id);
         if (funcionario.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário não encontrado para deletar.");
@@ -106,7 +107,7 @@ public class FuncionarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity atualizar(@PathVariable(value = "id")  UUID id, @RequestBody FuncionarioDTO dto) {
+    public ResponseEntity atualizar(@PathVariable(value = "id")  Long id, @RequestBody FuncionarioDTO dto) {
         Optional<Funcionario> funcionario = repositorio.findById(id);
         if (funcionario.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário não encontrado para atualizar.");

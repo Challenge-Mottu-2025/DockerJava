@@ -21,14 +21,20 @@ public class Usuario {
             message = "CPF inválido. Use 11 dígitos, com ou sem formatação."
     )
     private String cpf;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cep", referencedColumnName = "NR_CEP")
+
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "NR_CEP", referencedColumnName = "NR_CEP", nullable = false)
     private Endereco endereco;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "placa", referencedColumnName = "CD_PLACA")
+
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "CD_PLACA", referencedColumnName = "CD_PLACA", nullable = false)
     private Moto placa;
+
     @Temporal(TemporalType.DATE)
     @NotNull(message = "Data de nascimento não pode ser nula")
+    @Column(name = "DT_NASCIMENTO", nullable = false)
     private Date dataNascimento;
+
+    @Column(name = "ID_NOME", nullable = false)
     private String nome;
 }

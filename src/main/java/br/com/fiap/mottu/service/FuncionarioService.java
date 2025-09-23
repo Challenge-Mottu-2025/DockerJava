@@ -22,7 +22,7 @@ public class FuncionarioService {
     public Page<FuncionarioDTO> paginar(PageRequest req) {
         Page<Funcionario> funcionarios = cachingService.findAll(req);
 
-        return funcionarios.map(i -> new FuncionarioDTO(i.getNome(), i.getCpf(), i.getSenha()));
+        return funcionarios.map(i -> new FuncionarioDTO(i.getNome(), i.getCpf(), i.getSenha(), null));
     }
 
 }
