@@ -15,12 +15,12 @@ public class UsuarioCachingService {
     @Autowired
     UsuarioRepository repository;
 
-    @Cacheable(value = "cacheFindAll")
+    @Cacheable(value = "usuariosFindAll")
     public List<Usuario> cacheFindAll() {
         return repository.findAll();
     }
 
-    @Cacheable(value = "cacheFindById", key = "#cpf")
+    @Cacheable(value = "usuariosFindById", key = "#cpf")
     public Optional<Usuario> findById(String cpf) {
         return repository.findById(cpf);
     }

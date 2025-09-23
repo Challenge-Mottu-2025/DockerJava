@@ -18,24 +18,23 @@ public class FuncionarioCachingService {
     @Autowired
     FuncionarioRepository repository;
 
-    @Cacheable(value = "cacheFindAll")
+    @Cacheable(value = "funcionariosFindAll")
     public List<Funcionario> cacheFindAll() {
         return repository.findAll();
     }
 
-    @Cacheable(value = "cacheFindById", key = "#id")
+    @Cacheable(value = "funcionariosFindById", key = "#id")
     public Optional<Funcionario> findById(Long id) {
         return repository.findById(id);
     }
 
-    @Cacheable(value = "cacheFindByPage", key = "#req")
+    @Cacheable(value = "funcionariosFindByPage", key = "#req")
     public Page<Funcionario> findAll(PageRequest req) {
         return repository.findAll(req);
     }
 
-    @CacheEvict(value = {"cacheFindAll", "cacheFindById"}, allEntries = true)
+    @CacheEvict(value = {"funcionariosFindAll", "funcionariosFindById", "funcionariosFindByPage"}, allEntries = true)
     public void limparCache() {
         System.out.println("Limpando o cache!");
     }
-
 }
