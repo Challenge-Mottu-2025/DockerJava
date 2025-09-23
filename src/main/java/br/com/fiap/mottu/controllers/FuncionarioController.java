@@ -4,6 +4,8 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 import br.com.fiap.mottu.dto.FuncionarioDTO;
 import br.com.fiap.mottu.dto.IntroDTO;
+import br.com.fiap.mottu.dto.EnderecoDTO;
+import br.com.fiap.mottu.models.Endereco;
 import br.com.fiap.mottu.models.Funcionario;
 import br.com.fiap.mottu.repositories.FuncionarioRepository;
 import br.com.fiap.mottu.service.FuncionarioCachingService;
@@ -38,23 +40,17 @@ public class FuncionarioController {
 
     @GetMapping
     public ResponseEntity<EntityModel<IntroDTO>> intro() {
-
         IntroDTO dto = new IntroDTO("Setor de funcionarios da Mottu");
-
         EntityModel<IntroDTO> resource = EntityModel.of(dto);
 
         resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(FuncionarioController.class).pegueTodos())
                 .withRel("listar-funcionarios"));
-
         resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(FuncionarioController.class).peguePeloId(null))
                 .withRel("buscar-funcionario"));
-
         resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(FuncionarioController.class).cadastro(null))
                 .withRel("criar-funcionario"));
-
         resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(FuncionarioController.class).atualizar(null, null))
                 .withRel("atualizar-funcionario"));
-
         resource.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(FuncionarioController.class).deletar(null))
                 .withRel("deletar-funcionario"));
 
@@ -72,9 +68,7 @@ public class FuncionarioController {
                                                                @RequestParam(value = "size", defaultValue = "2") Integer size)
     {
         PageRequest req = PageRequest.of(page, size);
-
         Page<FuncionarioDTO> funcionarios_paginadas = service.paginar(req);
-
         return ResponseEntity.ok(funcionarios_paginadas);
     }
 
@@ -91,8 +85,15 @@ public class FuncionarioController {
     @PostMapping("/cadastro")
     public ResponseEntity cadastro(@RequestBody @Valid FuncionarioDTO dto) {
         var funcionario = new Funcionario();
-        BeanUtils.copyProperties(dto, funcionario);
-        // BeanUtils copiará nome, cpf, senha e cep (pois o DTO agora tem 'cep' component)
+        BeanUtils.copyProperties(dto, funcionario, "endereco");
+
+        if (dto.endereco() == null) {
+            return ResponseEntity.badRequest().body("Endereço é obrigatório.");
+        }
+        Endereco endereco = new Endereco();
+        BeanUtils.copyProperties(dto.endereco(), endereco);
+        funcionario.setEndereco(endereco);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(repositorio.save(funcionario));
     }
 
@@ -107,17 +108,25 @@ public class FuncionarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity atualizar(@PathVariable(value = "id")  Long id, @RequestBody FuncionarioDTO dto) {
-        Optional<Funcionario> funcionario = repositorio.findById(id);
-        if (funcionario.isEmpty()) {
+    public ResponseEntity atualizar(@PathVariable(value = "id")  Long id, @RequestBody @Valid FuncionarioDTO dto) {
+        Optional<Funcionario> funcionarioOpt = repositorio.findById(id);
+        if (funcionarioOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário não encontrado para atualizar.");
         }
-        var funcionarioAtualizado = funcionario.get();
-        BeanUtils.copyProperties(dto, funcionarioAtualizado);
-        return ResponseEntity.status(HttpStatus.OK).body(repositorio.save(funcionarioAtualizado));
+        var funcionario = funcionarioOpt.get();
+        BeanUtils.copyProperties(dto, funcionario, "id", "endereco");
+
+        if (dto.endereco() != null) {
+            Endereco end = funcionario.getEndereco();
+            if (end == null) end = new Endereco();
+            BeanUtils.copyProperties(dto.endereco(), end);
+            funcionario.setEndereco(end);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(repositorio.save(funcionario));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class) // Metodo de prevenção de erro do @Valid
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
@@ -125,5 +134,4 @@ public class FuncionarioController {
         );
         return ResponseEntity.badRequest().body(errors);
     }
-
 }

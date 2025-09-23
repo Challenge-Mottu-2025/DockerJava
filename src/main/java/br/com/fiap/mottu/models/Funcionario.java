@@ -36,7 +36,9 @@ public class Funcionario extends RepresentationModel<Funcionario> {
     @Column(name = "CD_SENHA")
     private String senha;
 
-    // Coluna NR_CEP (NOT NULL no seu DDL). Mantive como Long para bater com Endereco.NR_CEP
-    @Column(name = "NR_CEP", nullable = false)
-    private Long cep;
+    // FK: NR_CEP -> T_MT_Endereco.NR_CEP
+    // ManyToOne permite compartilhar o mesmo CEP entre funcionários
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "NR_CEP", referencedColumnName = "NR_CEP", nullable = false)
+    private Endereco endereco;
 }

@@ -1,7 +1,7 @@
 package br.com.fiap.mottu.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record FuncionarioDTO(
@@ -21,6 +21,5 @@ public record FuncionarioDTO(
         )
         String senha,
 
-        @NotNull(message = "CEP (NR_CEP) é obrigatório")
-        Long cep
+        @Valid EnderecoDTO endereco
 ) {}
