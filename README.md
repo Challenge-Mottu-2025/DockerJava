@@ -49,12 +49,20 @@
 
 Caso queira fazer um teste, a seguir, é um JSON para cadastrar um novo funcionário para o sistema:
 ```sh
-   {
-      "nome": "Linus Torvald",
-      "cpf": "62242321222",
-      "senha": "Linux71",
-      "cep": 20140702
-   }
+  {
+    "nome": "Linus Torvald",
+    "cpf": "62242321222",
+    "senha": "Linux71",
+    "endereco": {
+      "cep": 20140702,
+      "pais": "Brasil",
+      "estado": "SP",
+      "cidade": "São Paulo",
+      "bairro": "Centro",
+      "numero": 50,
+      "logradouro": "Av. Principal",
+      "complemento": "Apto 101"
+  }
    ```
 
 Lembrete: Para fazer o cadastro de funcionários, você precisa alterar o método de GET para POST
