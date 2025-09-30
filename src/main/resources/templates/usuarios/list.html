@@ -3,38 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <title>Usuários - Lista</title>
-    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/list.css}">
 </head>
-<body>
-<h1>Usuários</h1>
+<body class="page">
 
-<p th:if="${msg}" th:text="${msg}" style="color: green;"></p>
+<header class="topbar">
+    <div class="topbar__inner">
+        <h1 class="topbar__title">Usuários</h1>
+        <nav class="breadcrumbs">
+            <a th:href="@{/usuarios/ui}" class="breadcrumbs__link">Lista</a>
+            <span class="breadcrumbs__sep">/</span>
+            <span class="breadcrumbs__current">Início</span>
+        </nav>
+    </div>
+</header>
 
-<p>
-    <a th:href="@{/usuarios/ui/novo}">Novo usuário</a> |
-    <a th:href="@{/usuarios}">API JSON</a>
-</p>
+<main class="wrapper">
 
-<table border="1" cellpadding="6" cellspacing="0">
-    <thead>
-    <tr>
-        <th>CPF</th>
-        <th>Nome</th>
-        <th>Data Nasc.</th>
-        <th>CEP</th>
-        <th>Placa</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="u : ${usuarios}">
-        <td th:text="${u.cpf}">cpf</td>
-        <td th:text="${u.nome}">nome</td>
-        <td th:text="${#dates.format(u.dataNascimento, 'yyyy-MM-dd')}">data</td>
-        <td th:text="${u.endereco != null ? u.endereco.cep : ''}">cep</td>
-        <td th:text="${u.placa != null ? u.placa.placa : ''}">placa</td>
-    </tr>
-    </tbody>
-</table>
+    <div th:if="${msg}" class="alert alert--success" th:text="${msg}"></div>
+
+    <div class="actions-bar">
+        <div class="actions-bar__left">
+            <a th:href="@{/usuarios/ui/novo}" class="btn btn--primary">Novo Usuário</a>
+            <a th:href="@{/usuarios}" class="btn btn--ghost" title="Ver endpoint JSON da API">API JSON</a>
+        </div>
+        </form>
+    </div>
+
+    <div class="card table-card" th:if="${usuarios != null}">
+        <div class="table-wrapper" th:if="${#lists.size(usuarios) > 0}">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>CPF</th>
+                    <th>Nome</th>
+                    <th>Data Nasc.</th>
+                    <th>CEP</th>
+                    <th>Placa</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${usuarios}">
+                    <td data-label="CPF" th:text="${u.cpf}">12345678909</td>
+                    <td data-label="Nome" th:text="${u.nome}">Nome</td>
+                    <td data-label="Data Nasc." th:text="${#dates.format(u.dataNascimento, 'yyyy-MM-dd')}">1990-01-01</td>
+                    <td data-label="CEP" th:text="${u.endereco != null ? u.endereco.cep : ''}">00000000</td>
+                    <td data-label="Placa">
+                        <span th:if="${u.placa != null}" class="badge badge--plate" th:text="${u.placa.placa}">ABC1234</span>
+                        <span th:if="${u.placa == null}" class="badge badge--empty">Sem placa</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty-state" th:if="${#lists.size(usuarios) == 0}">
+            <div class="empty-state__icon" aria-hidden="true">🗂️</div>
+            <h2 class="empty-state__title">Nenhum usuário cadastrado</h2>
+            <p class="empty-state__text">Comece adicionando o primeiro registro.</p>
+            <a th:href="@{/usuarios/ui/novo}" class="btn btn--primary">Cadastrar Usuário</a>
+        </div>
+    </div>
+
+</main>
+
+<footer class="footer">
+    <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Organização Mottu</p>
+</footer>
 
 </body>
 </html>
