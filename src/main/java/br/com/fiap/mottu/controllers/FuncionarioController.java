@@ -1,11 +1,9 @@
 package br.com.fiap.mottu.controllers;
 
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 import br.com.fiap.mottu.dto.FuncionarioDTO;
 import br.com.fiap.mottu.dto.IntroDTO;
-import br.com.fiap.mottu.dto.EnderecoDTO;
 import br.com.fiap.mottu.models.Endereco;
 import br.com.fiap.mottu.models.Funcionario;
 import br.com.fiap.mottu.repositories.FuncionarioRepository;

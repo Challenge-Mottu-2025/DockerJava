@@ -9,6 +9,7 @@ import br.com.fiap.mottu.service.UsuarioCachingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -89,13 +90,21 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{cpf}")
-    public ResponseEntity deletar(@PathVariable(value = "cpf") String cpf) {
-        Optional<Usuario> usuario = repository.findById(cpf);
-        if (usuario.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado para deletar.");
-        }
-        repository.delete(usuario.get());
-        return ResponseEntity.ok("Usuário deletado com sucesso.");
+    public ResponseEntity<?> deletar(@PathVariable String cpf) {
+        return repository.findById(cpf).map(u -> {
+            try {
+                repository.delete(u);
+                if (cachingService != null) cachingService.limparCache();
+                return ResponseEntity.ok(Map.of("message","Usuário deletado"));
+            } catch (DataIntegrityViolationException ex) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of(
+                            "error","Não é possível deletar: dependências ainda existem.",
+                            "detail", ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage()
+                        ));
+            }
+        }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error","Usuário não encontrado")));
     }
 
     @PutMapping("/{cpf}")

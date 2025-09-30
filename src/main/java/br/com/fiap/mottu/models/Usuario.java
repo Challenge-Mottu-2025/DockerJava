@@ -22,11 +22,11 @@ public class Usuario {
     )
     private String cpf;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "NR_CEP", referencedColumnName = "NR_CEP", nullable = false)
     private Endereco endereco;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "CD_PLACA", referencedColumnName = "CD_PLACA", nullable = false)
     private Moto placa;
 

@@ -5,6 +5,7 @@
     <title>Usuários - Lista</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" th:href="@{/css/list.css}">
+    <script defer th:src="@{/js/list.js}"></script>
 </head>
 <body class="page">
 
@@ -21,15 +22,18 @@
 
 <main class="wrapper">
 
-    <div th:if="${msg}" class="alert alert--success" th:text="${msg}"></div>
-
+    <div th:if="${msg != null and msg != ''}"
+        class="alert alert--success alert--auto"
+        th:text="${msg}">
+    </div>
     <div class="actions-bar">
         <div class="actions-bar__left">
             <a th:href="@{/usuarios/ui/novo}" class="btn btn--primary">Novo Usuário</a>
             <a th:href="@{/usuarios}" class="btn btn--ghost" title="Ver endpoint JSON da API">API JSON</a>
         </div>
-        </form>
     </div>
+
+    <div class="toast" id="toast" hidden></div>
 
     <div class="card table-card" th:if="${usuarios != null}">
         <div class="table-wrapper" th:if="${#lists.size(usuarios) > 0}">
@@ -41,10 +45,11 @@
                     <th>Data Nasc.</th>
                     <th>CEP</th>
                     <th>Placa</th>
+                    <th style="min-width:140px;">Ações</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="u : ${usuarios}">
+                <tr th:each="u : ${usuarios}" th:attr="data-cpf=${u.cpf}">
                     <td data-label="CPF" th:text="${u.cpf}">12345678909</td>
                     <td data-label="Nome" th:text="${u.nome}">Nome</td>
                     <td data-label="Data Nasc." th:text="${#dates.format(u.dataNascimento, 'yyyy-MM-dd')}">1990-01-01</td>
@@ -52,6 +57,14 @@
                     <td data-label="Placa">
                         <span th:if="${u.placa != null}" class="badge badge--plate" th:text="${u.placa.placa}">ABC1234</span>
                         <span th:if="${u.placa == null}" class="badge badge--empty">Sem placa</span>
+                    </td>
+                    <td class="row-actions">
+                        <a th:href="@{'/usuarios/ui/' + ${u.cpf} + '/editar'}" class="btn btn--ghost btn--xs">Editar</a>
+                        <button type="button"
+                                class="btn btn--danger btn--xs js-delete-user"
+                                th:attr="data-cpf=${u.cpf}">
+                            Excluir
+                        </button>
                     </td>
                 </tr>
                 </tbody>
