@@ -1,5 +1,6 @@
 package br.com.fiap.mottu.controllers;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 import br.com.fiap.mottu.dto.FuncionarioDTO;
@@ -84,46 +85,45 @@ public class FuncionarioController {
 
     @PostMapping("/cadastro")
     public ResponseEntity cadastro(@RequestBody @Valid FuncionarioDTO dto) {
-        var funcionario = new Funcionario();
-        BeanUtils.copyProperties(dto, funcionario, "endereco");
-
         if (dto.endereco() == null) {
             return ResponseEntity.badRequest().body("Endereço é obrigatório.");
         }
-        Endereco endereco = new Endereco();
+        var funcionario = new Funcionario();
+        BeanUtils.copyProperties(dto, funcionario, "endereco");
+        var endereco = new Endereco();
         BeanUtils.copyProperties(dto.endereco(), endereco);
         funcionario.setEndereco(endereco);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(repositorio.save(funcionario));
+        var salvo = repositorio.save(funcionario);
+        cachingService.limparCache();
+        return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deletar(@PathVariable(value = "id")  Long id) {
-        Optional<Funcionario> funcionario = repositorio.findById(id);
-        if (funcionario.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário não encontrado para deletar.");
+    public ResponseEntity deletar(@PathVariable Long id) {
+        if (!repositorio.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário não encontrado.");
         }
-        repositorio.delete(funcionario.get());
+        repositorio.deleteById(id);
+        cachingService.limparCache();
         return ResponseEntity.status(HttpStatus.OK).body("Cadastro deletado com sucesso.");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity atualizar(@PathVariable(value = "id")  Long id, @RequestBody @Valid FuncionarioDTO dto) {
-        Optional<Funcionario> funcionarioOpt = repositorio.findById(id);
-        if (funcionarioOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário não encontrado para atualizar.");
-        }
-        var funcionario = funcionarioOpt.get();
-        BeanUtils.copyProperties(dto, funcionario, "id", "endereco");
-
+    public ResponseEntity atualizar(@PathVariable Long id, @RequestBody @Valid FuncionarioDTO dto) {
+        var opt = repositorio.findById(id);
+        if (opt.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Funcionário não encontrado.");
+        var f = opt.get();
+        BeanUtils.copyProperties(dto, f, "id", "endereco");
         if (dto.endereco() != null) {
-            Endereco end = funcionario.getEndereco();
+            var end = f.getEndereco();
             if (end == null) end = new Endereco();
             BeanUtils.copyProperties(dto.endereco(), end);
-            funcionario.setEndereco(end);
+            f.setEndereco(end);
         }
-
-        return ResponseEntity.status(HttpStatus.OK).body(repositorio.save(funcionario));
+        var salvo = repositorio.save(f);
+        cachingService.limparCache(); // <-- invalida
+        return ResponseEntity.ok(salvo);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
