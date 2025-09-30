@@ -1,148 +1,219 @@
-# Organização Mottu (Java / Spring Boot)
+# Organização Mottu – Backend Java (Spring Boot)
 
-Aplicação backend (com UI simples em Thymeleaf) para gestão de Usuários, Funcionários, Motos e Endereços da Organização Mottu.  
-O objetivo principal é organizar e disponibilizar de forma consistente os dados que futuramente serão integrados com outras soluções (C# / Front‑end / IoT).
+> Plataforma backend para gestão de Usuários, Funcionários, Motos e Endereços, com autenticação (Spring Security), versionamento de schema (Flyway), UI simples (Thymeleaf) e integração Oracle 19c.
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-21-orange.svg" />
+  <img src="https://img.shields.io/badge/Spring%20Boot-3.4.5-6DB33F.svg" />
+  <img src="https://img.shields.io/badge/Database-Oracle%2019c-red.svg" />
+  <img src="https://img.shields.io/badge/Flyway-10.x-aa2222.svg" />
+  <img src="https://img.shields.io/badge/Security-Spring%20Security-blue.svg" />
+  <img src="https://img.shields.io/badge/Build-Maven-044A53.svg" />
+  <img src="https://img.shields.io/badge/License-Educational-lightgrey.svg" />
+</p>
 
 ---
 
 ## Sumário
 
-1. Visão Geral  
-2. Principais Funcionalidades  
-3. Stack Tecnológica  
-4. Arquitetura & Modelagem  
-5. Endpoints REST (Usuários)  
-6. Interface Web (Thymeleaf)  
-7. Exemplos de JSON (Funcionário e Usuário)  
-8. Requisitos  
-9. Como Executar o Projeto  
-10. Configuração de Banco (Oracle)  
-11. Cache (Spring Cache)  
-12. Tratamento de Erros e Validações  
-13. Problemas Comuns (FAQ)  
-14. Docker (Build / Run)  
-15. Estrutura de Pastas (Resumo)  
-16. Contribuindo  
-17. Desenvolvedores  
-18. Licença  
+1. [Visão Geral](#1-visão-geral)  
+2. [Principais Funcionalidades](#2-principais-funcionalidades)  
+3. [Stack Tecnológica](#3-stack-tecnológica)  
+4. [Arquitetura & Domínio](#4-arquitetura--domínio)  
+5. [Autenticação & Autorização](#5-autenticação--autorização)  
+6. [Fluxo de Login (UI Padrão Spring)](#6-fluxo-de-login-ui-padrão-spring)  
+7. [Controle de Versões de Banco (Flyway)](#7-controle-de-versões-de-banco-flyway)  
+8. [Seeds & Dados Iniciais](#8-seeds--dados-iniciais)  
+9. [Endpoints REST Principais](#9-endpoints-rest-principais)  
+10. [Interface Web (Thymeleaf)](#10-interface-web-thymeleaf)  
+11. [Exemplos de Payload (JSON)](#11-exemplos-de-payload-json)  
+12. [Variáveis de Ambiente & Configuração](#12-variáveis-de-ambiente--configuração)  
+13. [Execução (Dev / Produção / Docker)](#13-execução-dev--produção--docker)  
+14. [Cache](#14-cache)  
+15. [Boas Práticas de Validação & Regras de Negócio](#15-boas-práticas-de-validação--regras-de-negócio)  
+16. [Tratamento de Erros](#16-tratamento-de-erros)  
+17. [FAQ (Problemas Comuns)](#17-faq-problemas-comuns)  
+18. [Estrutura de Pastas](#18-estrutura-de-pastas)  
+19. [Roadmap / Próximas Evoluções](#19-roadmap--próximas-evoluções)  
+20. [Contribuindo](#20-contribuindo)  
+21. [Desenvolvedores](#21-desenvolvedores)  
+22. [Licença](#22-licença)  
+23. [Referências](#23-referências)
 
 ---
 
 ## 1. Visão Geral
 
-Este repositório (DockerJava) contém a aplicação Java Spring Boot que se conecta a um banco Oracle para realizar operações de CRUD sobre entidades principais:
+Backend responsável por consolidar dados da organização Mottu e servir de base integradora com outros componentes (C#, IoT, front web externo).  
+Inclui autenticação baseada em Funcionários, autorização por roles e schema versionado via Flyway.
 
+Entidades centrais:
 - `Usuario`
 - `Funcionario`
-- `Endereco`
 - `Moto`
-
-Inclui:
-- API REST (JSON)
-- Interface Web simples para cadastro/edição/listagem (Thymeleaf + CSS custom)
-- Validação de entrada com Bean Validation
-- HATEOAS (em alguns endpoints)
-- Cache de consultas para otimizar leituras (ex.: lista de usuários)
+- `Endereco`
+- `Role` (segurança)
 
 ---
 
 ## 2. Principais Funcionalidades
 
-| Recurso | Funcionalidades |
-|---------|-----------------|
-| Usuários | Criar, listar, buscar por CPF, editar (UI), excluir |
-| Funcionários | Criar, listar, (demais operações podem ser expandidas) |
-| Moto | Associada a Usuário (OneToOne ou ManyToOne, conforme regra de negócio adotada) |
-| Endereço | Associado a Usuário e/ou Funcionário (pode ser compartilhado – cuidado com *cascade remove*) |
-| UI | Formulário responsivo + listagem com ações (Editar / Excluir) |
-| Validação | Regex para CPF, placa, NIV, motor, senha, etc. |
-| Cache | `@Cacheable` para `findAll` e `findById` de Usuário |
-| Feedback | Mensagens flash na UI para sucesso em criar/atualizar/deletar |
-| Tratamento de Integridade | Retorno amigável quando ocorrer ORA-02292 (FK) |
+| Categoria        | Recursos |
+|------------------|----------|
+| Usuários         | CRUD + busca por CPF + UI de listagem/edição |
+| Funcionários     | Autenticação, associação a roles, seed inicial |
+| Segurança        | Spring Security + BCrypt + restrição por ROLE |
+| Motos            | Vínculo com Usuário (ajustável p/ regras futuras) |
+| Endereços        | Compartilháveis — cuidado com cascades destrutivos |
+| Versionamento DB | Flyway (migrações incrementais + conversões de tipo) |
+| UI               | Thymeleaf minimalista / HTML5 / CSS custom |
+| Cache            | Spring Cache para listas e consultas repetidas |
+| Validação        | Bean Validation + Regex específicas (CPF, placa, NIV etc.) |
+| Observabilidade  | Logs estruturados, (futuro: actuator ampliado) |
 
 ---
 
 ## 3. Stack Tecnológica
 
-- Java 17+ (confirme a versão usada no seu ambiente)
-- Spring Boot (Web, Data JPA, Validation, Thymeleaf, Cache)
-- Oracle Database (jdbc driver ojdbc11)
-- HikariCP
-- Maven
-- Lombok
-- Docker (Dockerfile incluso)
-- Thymeleaf para UI
-- HTML/CSS (custom, dark/light com `prefers-color-scheme`)
+| Tecnologia | Uso |
+|------------|-----|
+| Java 21 | Plataforma principal |
+| Spring Boot 3.4.x | Starter (Web, Security, Data JPA, Validation, Thymeleaf, Cache) |
+| Oracle 19c | Banco de dados |
+| Flyway | Versionamento de schema e seeds idempotentes |
+| HikariCP | Pool de conexões |
+| Lombok | Redução de boilerplate |
+| Maven | Build / dependency management |
+| Docker | Empacotamento |
+| BCryptPasswordEncoder | Hash de senhas |
+| Thymeleaf | UI server-side |
 
 ---
 
-## 4. Arquitetura & Modelagem (Visão Simplificada)
-
-Entidades principais:
+## 4. Arquitetura & Domínio
 
 ```
-Usuario (CD_CPF PK)
- ├─ Endereco (NR_CEP FK) [OneToOne - sem cascade REMOVE se Endereco for compartilhado]
- └─ Moto (CD_PLACA FK)   [OneToOne; cuidado com CascadeType.ALL se houver compartilhamento]
- 
-Funcionario (ID_FUNCIONARIO PK)
- └─ Endereco (NR_CEP FK) [ManyToOne]
+Usuario (CD_CPF PK) ─┬─ Endereco (NR_CEP FK)
+                     └─ Moto (CD_PLACA FK)
+
+Funcionario (ID_FUNCIONARIO PK) ─┬─ Endereco (NR_CEP FK)
+                                 └─ * Roles (ManyToMany via T_MT_FUNCIONARIO_ROLE)
 ```
 
-Observações de modelagem:
-- Se **Moto** puder ser usada por vários usuários, mude o relacionamento para `@ManyToOne`.
-- Evite `cascade = CascadeType.ALL` em relacionamentos onde a entidade dependente é compartilhada (gera ORA-02292 ao deletar).
-- Utilize `LocalDate` em vez de `java.util.Date` onde possível (facilita conversões).
+Principais diretrizes:
+- CPF tratado como `String` (preserva zeros) – migrações converteram de NUMBER → VARCHAR2.
+- Scripts Flyway convertem colunas sensíveis antes de habilitar `ddl-auto=validate`.
+- Seeds escritos em PL/SQL idempotente (verificam existência antes de inserir).
+- Evitar `CascadeType.REMOVE` onde um recurso pode ser referenciado por múltiplas entidades.
 
 ---
 
-## 5. Endpoints REST (Usuários)
+## 5. Autenticação & Autorização
+
+- Login baseado em `Funcionario` (campo CPF utilizado como `username`).
+- Senhas armazenadas com BCrypt (60 chars).
+- Roles padrão semeadas:
+  - `ROLE_ADMIN`
+  - `ROLE_USER`
+- Usuário “administrador” inicial recebe ambas as roles.
+
+Exemplo de restrição (padrão):
+- `/usuarios/ui/**` → `ROLE_ADMIN` ou `ROLE_USER`
+- `/usuarios/**` (REST sensível) → apenas `ROLE_ADMIN`
+- `/funcionarios/**` → apenas `ROLE_ADMIN`
+
+---
+
+## 6. Fluxo de Login (UI Padrão Spring)
+
+1. Usuário não autenticado acessa rota protegida → redirecionado para `/login`.
+2. Form padrão envia `POST /login` com campos `username` (CPF) e `password`.
+3. Sucesso → redireciona para `/usuarios/ui` (configurável).
+4. Logout em `/logout` limpa sessão e redireciona para `/login?logout`.
+
+> Se quiser página custom, adicionar template `login.html` e substituir `.formLogin()` sem usar `.loginPage("/login")` ou fornecendo a view.
+
+---
+
+## 7. Controle de Versões de Banco (Flyway)
+
+| Versão | Descrição (resumo) | Categoria |
+|--------|---------------------|-----------|
+| V1 | Criação inicial de tabelas base | Schema |
+| V2 | Ajustes / constraints adicionais (ex.) | Schema |
+| V3 | Outras dependências / normalizações | Schema |
+| V4 | Seed inicial (endereços, moto, usuário, roles, funcionários) idempotente | Seed |
+| V5 | Adição de colunas de auditoria (ex.) | Evolução |
+| V6 | Conversão FUNCIONARIO.CD_CPF NUMBER → VARCHAR2 | Refactor |
+| V7 | Conversão MOTO.CD_CPF NUMBER → VARCHAR2 | Refactor |
+| V8 | Conversão USUARIO.CD_CPF NUMBER → VARCHAR2 | Refactor |
+| V9+ | (Planejado) Índices, CHECK de CPF, normalizações extras | Planejado |
+
+Boas práticas mantidas:
+- Nunca editar migrações aplicadas (criar novas).
+- Scripts de conversão usam coluna temporária + cópia + rename para evitar ORA-01439.
+- Seeds são idempotentes (usam `SELECT COUNT(*)` antes de inserir).
+
+---
+
+## 8. Seeds & Dados Iniciais
+
+Funcionário administrativo inicial (DEV):
+- CPF: `99999999999`
+- Senha default (se redefinida): **(definir localmente — nunca expor em produção)**
+
+Para resetar senha via SQL (exemplo):
+```sql
+UPDATE T_MT_FUNCIONARIO
+   SET CD_SENHA = '<HASH_BCRYPT_NOVO>'
+ WHERE CD_CPF = '99999999999';
+COMMIT;
+```
+
+Gerar hash:
+```java
+System.out.println(new BCryptPasswordEncoder().encode("NovaSenha123"));
+```
+
+> Recomenda-se criar migration de reset apenas em ambientes controlados (não commitar senhas reais).
+
+---
+
+## 9. Endpoints REST Principais
 
 Base: `http://localhost:8080`
 
-| Método | Endpoint | Descrição | Corpo |
-|--------|----------|-----------|-------|
-| GET    | `/usuarios` | Retorna recurso HATEOAS com links | - |
-| GET    | `/usuarios/todos` | Lista todos os usuários (pode ser cacheado) | - |
-| GET    | `/usuarios/{cpf}` | Busca usuário por CPF | - |
-| POST   | `/usuarios/cadastro` | Cria novo usuário | `UsuarioDTO` |
-| DELETE | `/usuarios/{cpf}` | Exclui usuário (se não houver restrições FK) | - |
-| PUT / POST* | `/usuarios/{cpf}` ou rota custom de atualização (se implementada) | Atualiza dados | `UsuarioDTO` |
+| Método | Endpoint | Descrição | Auth |
+|--------|----------|-----------|------|
+| GET | `/usuarios` | HATEOAS root / usuários | ROLE_USER |
+| GET | `/usuarios/todos` | Lista usuários | ROLE_USER |
+| GET | `/usuarios/{cpf}` | Detalhes | ROLE_USER |
+| POST | `/usuarios/cadastro` | Cria usuário | ROLE_ADMIN |
+| DELETE | `/usuarios/{cpf}` | Remove usuário | ROLE_ADMIN |
+| (UI) POST | `/usuarios/ui/{cpf}/atualizar` | Atualização via form | ROLE_USER / ADMIN |
 
-(*) Atualização via UI usa rota: `/usuarios/ui/{cpf}/atualizar` (POST).
-
-**Status comuns:**
-- 201 Created (cadastro)
-- 200 OK (consulta / delete bem-sucedido)
-- 400 Bad Request (validação)
-- 404 Not Found (CPF inexistente)
-- 409 Conflict (violação de integridade – sugerido em tratamento de delete)
-- 500 Internal Server Error (exceção não tratada / conversões)
+> Ajustar conforme ampliação de domínio (ex.: motos, funcionários).
 
 ---
 
-## 6. Interface Web (Thymeleaf)
+## 10. Interface Web (Thymeleaf)
 
-| Página | Rota | Função |
-|--------|------|--------|
-| Lista de Usuários | `/usuarios/ui` | Listagem + ações |
-| Novo Usuário | `/usuarios/ui/novo` | Form de criação |
-| Editar Usuário | `/usuarios/ui/{cpf}/editar` | Form preenchido |
-| Salvar (create) | `POST /usuarios/ui` | Processa formulário |
-| Atualizar | `POST /usuarios/ui/{cpf}/atualizar` | Processa edição |
-| Deletar (fallback) | `POST /usuarios/ui/{cpf}/deletar` | Exclusão via form |
-| Deletar (AJAX) | `DELETE /usuarios/{cpf}` | Exclusão via fetch JS |
+| Página | Rota |
+|--------|------|
+| Listagem de Usuários | `/usuarios/ui` |
+| Novo Usuário | `/usuarios/ui/novo` |
+| Editar Usuário | `/usuarios/ui/{cpf}/editar` |
+| Ações de exclusão | via botão / fetch DELETE |
 
-Feedback visual:
-- Mensagens de sucesso exibidas como barra verde (somem após timeout JS).
-- Mensagens de erro de validação exibidas abaixo dos campos.
+Feedback:
+- Mensagens flash para sucesso/erro.
+- Validações inline exibidas abaixo dos campos.
 
 ---
 
-## 7. Exemplos de JSON
+## 11. Exemplos de Payload (JSON)
 
-### 7.1. Funcionário (Cadastro)
-
+### Funcionário (Cadastro)
 ```json
 {
   "nome": "Linus Torvald",
@@ -161,8 +232,7 @@ Feedback visual:
 }
 ```
 
-### 7.2. Usuário (Cadastro com Endereço e Moto)
-
+### Usuário (Cadastro)
 ```json
 {
   "cpf": "12345678909",
@@ -170,7 +240,7 @@ Feedback visual:
     "cep": 20140702,
     "pais": "Brasil",
     "estado": "SP",
-    "cidade": "Rio de Janeiro",
+    "cidade": "São Paulo",
     "bairro": "Centro",
     "numero": 100,
     "logradouro": "Av. Principal",
@@ -189,185 +259,172 @@ Feedback visual:
 }
 ```
 
-### Validações Importantes
+### Regras de Validação (Resumo)
 
 | Campo | Regra |
 |-------|-------|
-| CPF | 11 dígitos (aceita com ou sem pontuação em alguns DTOs) |
-| Placa | Formato antigo `AAA9999` ou Mercosul `AAA9A99` |
-| NIV | 17 caracteres sem I, O, Q |
-| Motor | 2–3 letras + 4–8 dígitos |
-| Renavam | 7 a 11 dígitos (>= 1.000.000) |
-| Data | Formato ISO `yyyy-MM-dd` |
-| Senha (Funcionário) | Mín. 6 chars, contém maiúscula, minúscula e número |
+| CPF | 11 dígitos |
+| Placa | Antiga ou Mercosul |
+| NIV | 17 chars sem I,O,Q |
+| Motor | Prefixo letras + dígitos |
+| Renavam | 7–11 dígitos |
+| Senha | Mín. 6 chars + maiúscula + minúscula + número |
+| Data Nascimento | ISO `yyyy-MM-dd` |
 
 ---
 
-## 8. Requisitos
+## 12. Variáveis de Ambiente & Configuração
 
-- Java (JDK 17 ou superior)
-- Maven 3.8+
-- Docker (opcional, para empacotamento)
-- Banco Oracle acessível
-- Postman / Insomnia (testes) – opcional
-- Git
-
----
-
-## 9. Como Executar o Projeto
-
-```bash
-# 1. Clonar
-git clone https://github.com/Challenge-Mottu-2025/DockerJava.git
-cd DockerJava
-
-# 2. (Opcional) Configurar variáveis de ambiente para credenciais
-export ORACLE_USER=...
-export ORACLE_PASS=...
-
-# 3. Ajustar application.properties (ou application-local.properties)
-# 4. Build
-mvn clean package
-
-# 5. Rodar
-mvn spring-boot:run
-# ou
-java -jar target/*.jar
-```
-
-Aplicação por padrão: `http://localhost:8080`
-
----
-
-## 10. Configuração de Banco (Oracle)
-
-Exemplo de `application.properties` (adicione / ajuste conforme necessário):
+Sugestão de `application.properties` base:
 
 ```properties
-spring.datasource.url=jdbc:oracle:thin:@//HOST:PORT/SERVICE
-spring.datasource.username=${ORACLE_USER}
-spring.datasource.password=${ORACLE_PASS}
+spring.datasource.url=jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL
+spring.datasource.username=${DB_USER:SEU_USUARIO}
+spring.datasource.password=${DB_PASS:CHANGE_ME}
 spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
 
-spring.jpa.hibernate.ddl-auto=none
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration
 
-# Cache
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+
+spring.thymeleaf.cache=false
 spring.cache.type=simple
 
-# Thymeleaf (opcional)
-spring.thymeleaf.cache=false
+logging.level.org.springframework.security=INFO
 ```
 
-> Atenção: `ddl-auto=none` assume que o schema já existe. Se quiser gerar, use `update` (não recomendado em produção).
+Profile dev (`application-dev.properties`):
+```properties
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.orm.jdbc.bind=TRACE
+```
+
+Rodar com:
+```
+--spring.profiles.active=dev
+```
 
 ---
 
-## 11. Cache (Spring Cache)
+## 13. Execução (Dev / Produção / Docker)
 
-Implementação básica em `UsuarioCachingService`:
+### Local
+```bash
+git clone https://github.com/Challenge-Mottu-2025/DockerJava.git
+cd DockerJava
+mvn clean package
+mvn spring-boot:run
+```
 
-- `@Cacheable("usuariosFindAll")` para lista
-- `@Cacheable(value = "usuariosFindById", key = "#cpf")` para item
-- Invalidação manual adicionada via `@CacheEvict(allEntries = true)` em método `limparCache()`, chamado após create/update/delete.
-
-Se perceber dados defasados, certifique-se de que:
-- `@EnableCaching` está presente na classe principal
-- Chamadas de invalidação estão sendo feitas após mutações
-
----
-
-## 12. Tratamento de Erros e Validações
-
-| Situação | Código | Observação |
-|----------|--------|------------|
-| CPF não encontrado | 404 | Mensagem textual |
-| Violação FK (ORA-02292) | 409 (recomendado) | Quando implementado try/catch em delete |
-| Validação Bean (ex.: regex) | 400 | Lista de mensagens / primeira mensagem |
-| Exceção não tratada | 500 | Ajustar handler global futuramente |
-
-Sugestão futura: criar `@ControllerAdvice` para padronizar payload de erros.
-
----
-
-## 13. Problemas Comuns (FAQ)
-
-| Problema | Causa | Solução |
-|----------|-------|---------|
-| ORA-02292 ao deletar Usuário | Cascade tentando remover Moto/Endereco compartilhado | Remover CascadeType.REMOVE / ALL onde não exclusivo |
-| Data não aparecendo no form | Conversão `java.sql.Date.toInstant()` (Unsupported) | Usar `LocalDate` ou `sqlDate.toLocalDate()` |
-| Mensagem verde sempre exibida | `msg` injetada vazia no model | Remover `@ModelAttribute("msg")` no GET e condicionar no template |
-| Placa inválida | Regex não casou | Ver formato (Antigo vs Mercosul) |
-| Cache não atualiza | Falta de eviction | Chamar `limparCache()` ou desativar cache em dev |
-
----
-
-## 14. Docker
-
-### Build da imagem
-
-(Se existir um `Dockerfile` – ajustar comandos conforme o conteúdo real.)
-
+### Docker (exemplo)
 ```bash
 mvn clean package -DskipTests
 docker build -t mottu-app:latest .
+docker run -e DB_USER=... -e DB_PASS=... -p 8080:8080 mottu-app:latest
 ```
 
-### Executar
+> Caso queira Oracle XE local, considere compor com Docker Compose.
 
-```bash
-docker run -e ORACLE_USER=... -e ORACLE_PASS=... -p 8080:8080 mottu-app:latest
+---
+
+## 14. Cache
+
+Anotações `@Cacheable` aplicadas em consultas de usuários.  
+Invalidar após mutações (create/update/delete) com `@CacheEvict(allEntries=true)`.  
+Se perceber inconsistências em dev → desabilitar cache ou limpar.
+
+---
+
+## 15. Boas Práticas de Validação & Regras de Negócio
+
+- Normalizar CPF removendo caracteres não numéricos antes de persistir.
+- Evitar `CascadeType.ALL` em relacionamentos reutilizáveis.
+- Usar `@Transactional` em serviços que fazem múltiplas operações relacionadas.
+- Sempre validar input externo (DTO separado da entidade).
+
+---
+
+## 16. Tratamento de Erros
+
+| Situação | Código Sugerido | Observação |
+|----------|-----------------|------------|
+| Recurso não encontrado | 404 | Ex.: CPF inexistente |
+| Violação de integridade | 409 | Ex.: ORA-02292 ao deletar |
+| Validação Bean | 400 | Lista de erros |
+| Falha de autenticação | 401 | Login inválido |
+| Acesso negado | 403 | Sem role suficiente |
+| Exceção não tratada | 500 | Capturar futuramente em `@ControllerAdvice` |
+
+> Futuro: criar padrão de resposta JSON (`timestamp`, `path`, `message`, `errors`).
+
+---
+
+## 17. FAQ (Problemas Comuns)
+
+| Problema | Causa | Solução |
+|----------|-------|---------|
+| “Bad credentials” | Hash não corresponde à senha digitada | Regenerar hash BCrypt e atualizar |
+| ORA-01439 em migração | ALTER tipo direto com dados existentes | Usar estratégia coluna temporária (já aplicada) |
+| 404 em `/login` | `.loginPage("/login")` sem template | Remover `loginPage()` ou criar `login.html` |
+| ORA-02292 ao deletar | Cascade inadequado | Ajustar mapeamentos |
+| CPF truncado | Coluna NUMBER | Converter para VARCHAR2 (feito em V6–V8) |
+| Página Whitelabel erro | Sem template `/error` | Criar error.html |
+
+---
+
+## 18. Estrutura de Pastas
+
 ```
-
-Se precisar montar um arquivo de configuração diferente:
-
-```bash
-docker run -v $(pwd)/config/application.properties:/app/config/application.properties \
-  -e SPRING_CONFIG_LOCATION=classpath:/application.properties,file:/app/config/application.properties \
-  -p 8080:8080 mottu-app:latest
+src/main/java/br/com/fiap/mottu
+ ├─ security/            # SecurityConfig, UserDetailsService, etc.
+ ├─ models/              # Entidades JPA
+ ├─ repositories/        # Interfaces Spring Data
+ ├─ service/             # Regras / orquestrações
+ ├─ controllers/         # REST + UI (Thymeleaf)
+ ├─ dto/                 # Transfer Objects / formulários
+ └─ MottuApplication.java
+src/main/resources
+ ├─ db/migration         # Scripts Flyway (V1__... Vn__...)
+ ├─ templates            # Views Thymeleaf
+ ├─ static               # CSS / JS
+ └─ application.properties
 ```
 
 ---
 
-## 15. Estrutura de Pastas (Resumo)
+## 19. Roadmap / Próximas Evoluções
 
-```
-src/
- └─ main
-     ├─ java/br/com/fiap/mottu
-     │   ├─ controllers       # REST + UI (Thymeleaf)
-     │   ├─ dto               # DTO / Form objects
-     │   ├─ models            # Entidades JPA
-     │   ├─ repositories      # Spring Data JPA
-     │   ├─ service           # Serviços (cache, regras)
-     │   └─ MottuApplication  # Classe principal (@SpringBootApplication)
-     └─ resources
-         ├─ templates/usuarios # list.html / form.html
-         ├─ static/css         # Arquivos CSS custom
-         ├─ static/js          # JS (ex.: list.js para deletar via fetch)
-         └─ application.properties
-```
+| Item | Prioridade | Status |
+|------|------------|--------|
+| Página custom de login | Média | Pendente |
+| Testes unitários / integração | Alta | Pendente |
+| Padronizar payload de erro | Média | Pendente |
+| Auditoria (triggers + colunas) | Média | Parcial |
+| Docker Compose (Oracle XE) | Média | Pendente |
+| Índices adicionais (CPF / placa) | Alta | Planejado |
+| Observabilidade (Actuator + métricas) | Média | Pendente |
+| Rate limiting / proteções extras | Baixa | Futuro |
 
 ---
 
-## 16. Contribuindo
+## 20. Contribuindo
 
-1. Crie uma branch: `git checkout -b feature/nome-da-feature`
-2. Faça commits claros
-3. Rode testes (quando existirem) e lint
-4. Abra Pull Request descrevendo mudanças
-5. Aguarde revisão
+1. Criar branch: `git checkout -b feature/nome`
+2. Implementar / testar
+3. Padronizar mensagens de commit
+4. Abrir Pull Request descrevendo motivação e mudanças
+5. Aguardar revisão
 
-Boas práticas futuras:
-- Adicionar testes unitários / integração
-- Adicionar Docker Compose (Oracle XE + app)
-- Implementar autenticação / segurança
-- Padronizar respostas de erro (JSON consistente)
+> Recomenda-se adicionar testes conforme novas regras de negócio forem surgindo.
 
 ---
 
-## 17. Desenvolvedores
+## 21. Desenvolvedores
 
 | Nome | Contato |
 |------|---------|
@@ -376,26 +433,26 @@ Boas práticas futuras:
 
 ---
 
-## 18. Licença
+## 22. Licença
 
-(Defina a licença do projeto. Ex.: MIT, Apache 2.0 ou “Uso acadêmico interno”.)
-
-Exemplo:
+Projeto de uso educacional para o Challenge Mottu 2025.  
+Definir licença formal (MIT / Apache 2.0 / interna) antes de uso comercial.
 
 ```
-Este projeto é de uso educacional e interno para o Challenge Mottu 2025.  
-Defina aqui a licença apropriada antes de uso comercial.
+Este software é distribuído "como está", sem garantias explícitas ou implícitas.
 ```
 
 ---
 
-## Referências
+## 23. Referências
 
-- [Spring Boot](https://spring.io/projects/spring-boot)
-- [Thymeleaf](https://www.thymeleaf.org/)
-- [Bean Validation (Jakarta)](https://beanvalidation.org/)
-- [Oracle JDBC Driver](https://www.oracle.com/database/technologies/appdev/jdbc.html)
+- [Spring Boot](https://spring.io/projects/spring-boot)  
+- [Spring Security](https://spring.io/projects/spring-security)  
+- [Flyway](https://flywaydb.org/)  
+- [Thymeleaf](https://www.thymeleaf.org/)  
+- [Bean Validation (Jakarta)](https://beanvalidation.org/)  
+- [Oracle JDBC Driver](https://www.oracle.com/database/technologies/appdev/jdbc.html)  
 
 ---
 
-> Dúvidas ou sugestões? Abra uma issue ou entre em contato com os desenvolvedores listados.
+> Dúvidas, sugestões ou melhorias: abra uma issue ou entre em contato com os desenvolvedores.
