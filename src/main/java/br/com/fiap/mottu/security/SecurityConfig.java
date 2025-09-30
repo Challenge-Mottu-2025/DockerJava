@@ -29,6 +29,7 @@ public class SecurityConfig {
         DaoAuthenticationProvider p = new DaoAuthenticationProvider();
         p.setPasswordEncoder(passwordEncoder());
         p.setUserDetailsService(userDetailsService);
+        p.setHideUserNotFoundExceptions(false);
         return p;
     }
 
@@ -37,27 +38,23 @@ public class SecurityConfig {
 
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/login", "/error").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/css/**","/js/**","/images/**").permitAll()
+                .requestMatchers("/login","/error","/actuator/health").permitAll()
                 .requestMatchers("/usuarios/ui/**").hasAnyRole("ADMIN","USER")
-                .requestMatchers("/usuarios/**").hasRole("ADMIN")
-                .requestMatchers("/funcionarios/**").hasRole("ADMIN")
+                .requestMatchers("/usuarios/**","/funcionarios/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form
+            .formLogin(f -> f
                 .defaultSuccessUrl("/usuarios/ui", true)
                 .permitAll()
             )
             .logout(l -> l
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout=true")
+                .logoutSuccessUrl("/login?logout")
                 .invalidateHttpSession(true)
-                .clearAuthentication(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()
             )
-            .authenticationProvider(authenticationProvider())
             .csrf(csrf -> csrf.disable());
 
         return http.build();
