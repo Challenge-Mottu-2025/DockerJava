@@ -5,52 +5,138 @@
     <title>Novo Usuário</title>
 </head>
 <body>
-<h1>Novo Usuário</h1>
+
+<h1 style="margin-bottom:4px;">Cadastro de Usuário</h1>
+<small th:if="${msg}" th:text="${msg}" style="color:green;"></small>
+<hr>
 
 <form th:action="@{/usuarios/ui}" th:object="${usuarioForm}" method="post">
 
-    <fieldset>
-        <legend>Dados do Usuário</legend>
-        <label>CPF: <input type="text" th:field="*{cpf}" placeholder="12345678909"></label>
-        <div th:if="${#fields.hasErrors('cpf')}" th:errors="*{cpf}" style="color:red"></div>
-
-        <label>Nome: <input type="text" th:field="*{nome}"></label>
-        <div th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}" style="color:red"></div>
-
-        <label>Data de Nascimento: <input type="date" th:field="*{dataNascimento}"></label>
-        <div th:if="${#fields.hasErrors('dataNascimento')}" th:errors="*{dataNascimento}" style="color:red"></div>
-    </fieldset>
+    <div th:if="${#fields.hasErrors()}" style="border:1px solid #aa0000; padding:8px;" role="alert">
+        <b>Existem erros no formulário.</b><br>
+        Verifique os campos destacados abaixo.
+    </div>
+    <br>
 
     <fieldset>
-        <legend>Endereço</legend>
-        <label>CEP: <input type="number" th:field="*{cep}"></label>
-        <div th:if="${#fields.hasErrors('cep')}" th:errors="*{cep}" style="color:red"></div>
-
-        <label>País: <input type="text" th:field="*{pais}"></label>
-        <label>Estado (UF): <input type="text" th:field="*{estado}" maxlength="2"></label>
-        <label>Cidade: <input type="text" th:field="*{cidade}"></label>
-        <label>Bairro: <input type="text" th:field="*{bairro}"></label>
-        <label>Número: <input type="number" th:field="*{numero}"></label>
-        <label>Logradouro: <input type="text" th:field="*{logradouro}"></label>
-        <label>Complemento: <input type="text" th:field="*{complemento}"></label>
+        <legend><b>Dados do Usuário</b></legend>
+        <table cellpadding="6" cellspacing="0" border="0">
+            <tr>
+                <td>
+                    <label for="cpf">CPF:</label><br>
+                    <input id="cpf" type="text" th:field="*{cpf}" placeholder="12345678909">
+                    <div th:if="${#fields.hasErrors('cpf')}" th:errors="*{cpf}" style="color:red;"></div>
+                </td>
+                <td>
+                    <label for="nome">Nome:</label><br>
+                    <input id="nome" type="text" th:field="*{nome}" placeholder="Nome completo">
+                    <div th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}" style="color:red;"></div>
+                </td>
+                <td>
+                    <label for="dataNascimento">Data de Nascimento:</label><br>
+                    <input id="dataNascimento" type="date" th:field="*{dataNascimento}">
+                    <div th:if="${#fields.hasErrors('dataNascimento')}" th:errors="*{dataNascimento}" style="color:red;"></div>
+                </td>
+            </tr>
+        </table>
     </fieldset>
+
+    <br>
 
     <fieldset>
-        <legend>Moto</legend>
-        <label>Placa: <input type="text" th:field="*{placa}" placeholder="ABC1234"></label>
-        <div th:if="${#fields.hasErrors('placa')}" th:errors="*{placa}" style="color:red"></div>
-
-        <label>CPF da moto (opcional): <input type="text" th:field="*{cpfMoto}" placeholder="deixe em branco para usar o CPF do usuário"></label>
-
-        <label>NIV (chassi): <input type="text" th:field="*{niv}" maxlength="17"></label>
-        <label>Motor: <input type="text" th:field="*{motor}"></label>
-        <label>Renavam: <input type="number" th:field="*{renavam}"></label>
-        <label>Tabela FIPE: <input type="number" th:field="*{fipe}"></label>
+        <legend><b>Endereço</b></legend>
+        <table cellpadding="6" cellspacing="0" border="0">
+            <tr>
+                <td>
+                    <label for="cep">CEP:</label><br>
+                    <input id="cep" type="number" th:field="*{cep}" placeholder="00000000">
+                    <div th:if="${#fields.hasErrors('cep')}" th:errors="*{cep}" style="color:red;"></div>
+                </td>
+                <td>
+                    <label for="pais">País:</label><br>
+                    <input id="pais" type="text" th:field="*{pais}" placeholder="Brasil">
+                </td>
+                <td>
+                    <label for="estado">Estado (UF):</label><br>
+                    <input id="estado" type="text" th:field="*{estado}" maxlength="2" placeholder="SP">
+                </td>
+                <td>
+                    <label for="cidade">Cidade:</label><br>
+                    <input id="cidade" type="text" th:field="*{cidade}">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="bairro">Bairro:</label><br>
+                    <input id="bairro" type="text" th:field="*{bairro}">
+                </td>
+                <td>
+                    <label for="numero">Número:</label><br>
+                    <input id="numero" type="number" th:field="*{numero}">
+                </td>
+                <td colspan="2">
+                    <label for="logradouro">Logradouro:</label><br>
+                    <input id="logradouro" type="text" th:field="*{logradouro}" style="width:95%;">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <label for="complemento">Complemento:</label><br>
+                    <input id="complemento" type="text" th:field="*{complemento}" style="width:98%;">
+                </td>
+            </tr>
+        </table>
     </fieldset>
 
-    <button type="submit">Salvar</button>
-    <a th:href="@{/usuarios/ui}">Cancelar</a>
+    <br>
+
+    <fieldset>
+        <legend><b>Dados da Moto</b></legend>
+        <table cellpadding="6" cellspacing="0" border="0">
+            <tr>
+                <td>
+                    <label for="placa">Placa:</label><br>
+                    <input id="placa" type="text" th:field="*{placa}" placeholder="ABC1234">
+                    <div th:if="${#fields.hasErrors('placa')}" th:errors="*{placa}" style="color:red;"></div>
+                </td>
+                <td>
+                    <label for="cpfMoto">CPF da Moto (opcional):</label><br>
+                    <input id="cpfMoto" type="text" th:field="*{cpfMoto}" placeholder="Se vazio usa CPF do usuário">
+                </td>
+                <td>
+                    <label for="niv">NIV (Chassi):</label><br>
+                    <input id="niv" type="text" th:field="*{niv}" maxlength="17" placeholder="17 chars">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="motor">Motor:</label><br>
+                    <input id="motor" type="text" th:field="*{motor}">
+                </td>
+                <td>
+                    <label for="renavam">Renavam:</label><br>
+                    <input id="renavam" type="number" th:field="*{renavam}">
+                </td>
+                <td>
+                    <label for="fipe">Tabela FIPE:</label><br>
+                    <input id="fipe" type="number" th:field="*{fipe}">
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+
+    <br>
+
+    <div>
+        <button type="submit">Salvar</button>
+        &nbsp;
+        <a th:href="@{/usuarios/ui}">Cancelar</a>
+    </div>
+
 </form>
+
+<br><hr>
+<small>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Organização Mottu</small>
 
 </body>
 </html>
