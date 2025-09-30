@@ -36,9 +36,7 @@ public class Funcionario extends RepresentationModel<Funcionario> {
     @Column(name = "CD_SENHA")
     private String senha;
 
-    // FK: NR_CEP -> T_MT_Endereco.NR_CEP
-    // ManyToOne permite compartilhar o mesmo CEP entre funcionários
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "NR_CEP", referencedColumnName = "NR_CEP", nullable = false)
     private Endereco endereco;
 }

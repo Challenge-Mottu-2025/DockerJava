@@ -113,6 +113,26 @@ body.page {
   border-color: var(--success-border);
 }
 
+.alert:empty {
+  display: none !important;
+}
+
+.alert--fade-out {
+  animation: fadeOutAlert .6s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes fadeOutAlert {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+    height: 0;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
 .actions-bar {
   display: flex;
   flex-wrap: wrap;

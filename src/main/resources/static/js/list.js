@@ -57,4 +57,15 @@
 
   document.addEventListener("DOMContentLoaded", wire);
 
+  document.addEventListener("DOMContentLoaded", () => {
+    const alert = document.querySelector(".alert--auto");
+    if (alert) {
+      alert.style.display = "block";
+      setTimeout(() => {
+        alert.classList.add("alert--fade-out");
+        setTimeout(() => alert.remove(), 700);
+      }, 3000);
+    }
+  });
+
 })();

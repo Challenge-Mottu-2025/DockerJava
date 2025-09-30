@@ -22,8 +22,10 @@
 
 <main class="wrapper">
 
-    <div th:if="${msg}" class="alert alert--success" th:text="${msg}"></div>
-
+    <div th:if="${msg != null and msg != ''}"
+        class="alert alert--success alert--auto"
+        th:text="${msg}">
+    </div>
     <div class="actions-bar">
         <div class="actions-bar__left">
             <a th:href="@{/usuarios/ui/novo}" class="btn btn--primary">Novo Usuário</a>
