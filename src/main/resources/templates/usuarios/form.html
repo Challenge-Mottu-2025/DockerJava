@@ -2,30 +2,28 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro de Usuário</title>
+    <title th:text="${editing} ? 'Editar Usuário' : 'Cadastrar Usuário'">Cadastro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" th:href="@{/css/form.css}">
 </head>
 <body class="page">
-
 <header class="topbar">
     <div class="topbar__inner">
-        <h1 class="topbar__title">Cadastro de Usuário</h1>
+        <h1 class="topbar__title" th:text="${editing} ? 'Editar Usuário' : 'Cadastro de Usuário'">Cadastro de Usuário</h1>
         <nav class="breadcrumbs">
             <a th:href="@{/usuarios/ui}" class="breadcrumbs__link">Lista de Usuários</a>
             <span class="breadcrumbs__sep">/</span>
-            <span class="breadcrumbs__current">Novo</span>
+            <span class="breadcrumbs__current" th:text="${editing} ? 'Editar' : 'Novo'">Novo</span>
         </nav>
     </div>
 </header>
-
 <main class="wrapper">
-
-    <form th:action="@{/usuarios/ui}" th:object="${usuarioForm}" method="post" class="card form">
-
+    <form th:action="${formAction}" 
+          th:object="${usuarioForm}" 
+          method="post" class="card form"
+          >
         <div th:if="${msg}" class="alert alert--success" th:text="${msg}"></div>
-
-        <div th:if="${#fields.hasErrors()}" class="alert alert--error" role="alert" aria-live="assertive">
+        <div th:if="${#fields.hasErrors()}" class="alert alert--error">
             <strong>Existem erros no formulário.</strong>
             <p>Revise os campos destacados abaixo.</p>
         </div>
@@ -34,17 +32,16 @@
             <div class="grid">
                 <div class="field">
                     <label for="cpf">CPF</label>
-                    <input id="cpf" type="text" th:field="*{cpf}" placeholder="12345678909" autocomplete="off" required>
+                    <input id="cpf" type="text" th:field="*{cpf}" placeholder="12345678909"
+                           th:readonly="${editing}">
                     <small class="hint">11 dígitos, somente números.</small>
                     <div class="error" th:if="${#fields.hasErrors('cpf')}" th:errors="*{cpf}"></div>
                 </div>
-
                 <div class="field">
                     <label for="nome">Nome</label>
                     <input id="nome" type="text" th:field="*{nome}" placeholder="Nome completo" required>
                     <div class="error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
                 </div>
-
                 <div class="field">
                     <label for="dataNascimento">Data de Nascimento</label>
                     <input id="dataNascimento" type="date" th:field="*{dataNascimento}" required>
@@ -95,7 +92,7 @@
             <div class="grid">
                 <div class="field">
                     <label for="placa">Placa</label>
-                    <input id="placa" type="text" th:field="*{placa}" placeholder="ABC1234" required>
+                    <input id="placa" type="text" th:field="*{placa}" placeholder="ABC1234" th:readonly="${editing}" required>
                     <div class="error" th:if="${#fields.hasErrors('placa')}" th:errors="*{placa}"></div>
                 </div>
                 <div class="field">
@@ -125,15 +122,13 @@
             </div>
         </section>
         <div class="actions">
-            <button type="submit" class="btn btn--primary">Salvar</button>
+            <button type="submit" class="btn btn--primary" th:text="${editing} ? 'Atualizar' : 'Salvar'">Salvar</button>
             <a th:href="@{/usuarios/ui}" class="btn btn--ghost">Cancelar</a>
         </div>
     </form>
 </main>
-
 <footer class="footer">
     <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Organização Mottu</p>
 </footer>
-
 </body>
 </html>
