@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Mottu</title>
+    <link rel="stylesheet" th:href="@{/css/usuarios-form.css}">
+    <style>
+        .login-wrapper {
+            max-width: 420px;
+            margin: 7vh auto;
+        }
+        .login-card {
+            background: var(--bg-card,#1c242d);
+            padding: 2rem 2rem 2.2rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 22px -6px rgba(0,0,0,.45);
+            border: 1px solid #2f3d49;
+            display: flex;
+            flex-direction: column;
+            gap: 1.3rem;
+        }
+        .login-card h1 {
+            margin:0;
+            font-size:1.25rem;
+            text-align:center;
+        }
+        .field label { font-size:.7rem; letter-spacing:.5px; font-weight:600; }
+        .field input { width:100%; }
+        .error-msg {
+            background:#5d2020;
+            color:#ffd6d6;
+            padding:.6rem .75rem;
+            border-radius:8px;
+            font-size:.7rem;
+            text-align:center;
+        }
+        .logout-msg {
+            background:#1e4730;
+            color:#c6f3dc;
+            padding:.6rem .75rem;
+            border-radius:8px;
+            font-size:.7rem;
+            text-align:center;
+        }
+    </style>
+</head>
+<body class="page">
+<div class="login-wrapper">
+    <form class="login-card" th:action="@{/login}" method="post">
+        <h1>Autenticação</h1>
+
+        <div th:if="${param.error}" class="error-msg">
+            Credenciais inválidas. Verifique CPF e senha.
+        </div>
+        <div th:if="${param.logout}" class="logout-msg">
+            Sessão encerrada com sucesso.
+        </div>
+
+        <div class="field">
+            <label for="username">CPF</label>
+            <input id="username" name="username" type="text" placeholder="CPF" required>
+        </div>
+        <div class="field">
+            <label for="password">Senha</label>
+            <input id="password" name="password" type="password" placeholder="Senha" required>
+        </div>
+
+        <div class="actions" style="justify-content:center;">
+            <button type="submit" class="btn btn--primary" style="width:100%;">Entrar</button>
+        </div>
+        <p style="text-align:center; font-size:.65rem; opacity:.6;">
+            Usuário ADMIN de exemplo: 99999999999 / Senha: Admin123<br>
+            Usuário USER de exemplo: 88888888888 / Senha: User123
+        </p>
+    </form>
+</div>
+</body>
+</html>

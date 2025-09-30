@@ -8,6 +8,7 @@ import br.com.fiap.mottu.repositories.UsuarioRepository;
 import br.com.fiap.mottu.service.UsuarioCachingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +19,7 @@ import java.time.ZoneId;
 import java.util.Optional;
 
 @Controller
+@PreAuthorize("hasAnyRole('ADMIN','USER')")
 @RequestMapping("/usuarios/ui")
 public class UsuarioViewController {
 
@@ -194,6 +196,7 @@ public class UsuarioViewController {
         return "redirect:/usuarios/ui";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{cpf}/deletar")
     public String deletar(@PathVariable String cpf, RedirectAttributes ra) {
         Optional<Usuario> opt = usuarioRepository.findById(cpf);

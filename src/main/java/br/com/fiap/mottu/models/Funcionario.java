@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+
+import java.util.Set;
+
 import org.springframework.hateoas.RepresentationModel;
 
 @Entity(name = "funcionarios")
@@ -39,4 +42,12 @@ public class Funcionario extends RepresentationModel<Funcionario> {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "NR_CEP", referencedColumnName = "NR_CEP", nullable = false)
     private Endereco endereco;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "T_MT_FUNCIONARIO_ROLE",
+        joinColumns = @JoinColumn(name = "ID_FUNCIONARIO"),
+        inverseJoinColumns = @JoinColumn(name = "ID_ROLE")
+    )
+    private Set<Role> roles;
 }
