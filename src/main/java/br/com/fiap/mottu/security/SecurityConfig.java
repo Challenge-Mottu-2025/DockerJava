@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .formLogin(f -> f
-                .defaultSuccessUrl("/usuarios/ui", true)
+                .defaultSuccessUrl("/home", true)
                 .permitAll()
             )
             .logout(l -> l

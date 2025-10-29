@@ -11,6 +11,8 @@
     <div class="topbar__inner">
         <h1 class="topbar__title" th:text="${editing} ? 'Editar Usuário' : 'Cadastro de Usuário'">Cadastro de Usuário</h1>
         <nav class="breadcrumbs">
+            <a th:href="@{/home}" class="breadcrumbs__link">Início</a>
+            <span class="breadcrumbs__sep">/</span>
             <a th:href="@{/usuarios/ui}" class="breadcrumbs__link">Lista de Usuários</a>
             <span class="breadcrumbs__sep">/</span>
             <span class="breadcrumbs__current" th:text="${editing} ? 'Editar' : 'Novo'">Novo</span>
@@ -58,77 +60,38 @@
                     <div class="error" th:if="${#fields.hasErrors('cep')}" th:errors="*{cep}"></div>
                 </div>
                 <div class="field">
-                    <label for="pais">País</label>
-                    <input id="pais" type="text" th:field="*{pais}" placeholder="Brasil" required>
-                </div>
-                <div class="field">
-                    <label for="estado">Estado (UF)</label>
-                    <input id="estado" type="text" th:field="*{estado}" maxlength="2" placeholder="SP" required>
-                </div>
-                <div class="field">
-                    <label for="cidade">Cidade</label>
-                    <input id="cidade" type="text" th:field="*{cidade}" required>
-                </div>
-                <div class="field">
-                    <label for="bairro">Bairro</label>
-                    <input id="bairro" type="text" th:field="*{bairro}" required>
+                    <label for="logradouro">Logradouro</label>
+                    <input id="logradouro" type="text" th:field="*{logradouro}" placeholder="Rua/Av.">
+                    <div class="error" th:if="${#fields.hasErrors('logradouro')}" th:errors="*{logradouro}"></div>
                 </div>
                 <div class="field">
                     <label for="numero">Número</label>
-                    <input id="numero" type="number" th:field="*{numero}" min="0" required>
+                    <input id="numero" type="text" th:field="*{numero}" placeholder="Número">
+                    <div class="error" th:if="${#fields.hasErrors('numero')}" th:errors="*{numero}"></div>
                 </div>
-                <div class="field field--wide">
-                    <label for="logradouro">Logradouro</label>
-                    <input id="logradouro" type="text" th:field="*{logradouro}" required>
-                </div>
-                <div class="field field--wide">
+                <div class="field">
                     <label for="complemento">Complemento</label>
-                    <input id="complemento" type="text" th:field="*{complemento}">
+                    <input id="complemento" type="text" th:field="*{complemento}" placeholder="Complemento">
+                </div>
+                <div class="field">
+                    <label for="cidade">Cidade</label>
+                    <input id="cidade" type="text" th:field="*{cidade}" placeholder="Cidade">
+                    <div class="error" th:if="${#fields.hasErrors('cidade')}" th:errors="*{cidade}"></div>
+                </div>
+                <div class="field">
+                    <label for="estado">Estado</label>
+                    <input id="estado" type="text" th:field="*{estado}" placeholder="UF">
+                    <div class="error" th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}"></div>
                 </div>
             </div>
         </section>
-        <section class="section">
-            <h2 class="section__title">Dados da Moto</h2>
-            <div class="grid">
-                <div class="field">
-                    <label for="placa">Placa</label>
-                    <input id="placa" type="text" th:field="*{placa}" placeholder="ABC1234" th:readonly="${editing}" required>
-                    <div class="error" th:if="${#fields.hasErrors('placa')}" th:errors="*{placa}"></div>
-                </div>
-                <div class="field">
-                    <label for="cpfMoto">CPF da Moto (opcional)</label>
-                    <input id="cpfMoto" type="text" th:field="*{cpfMoto}" placeholder="Se vazio usa o CPF do usuário">
-                </div>
-                <div class="field">
-                    <label for="niv">NIV (Chassi)</label>
-                    <input id="niv" type="text" th:field="*{niv}" maxlength="17" placeholder="17 caracteres" required>
-                    <div class="error" th:if="${#fields.hasErrors('niv')}" th:errors="*{niv}"></div>
-                </div>
-                <div class="field">
-                    <label for="motor">Motor</label>
-                    <input id="motor" type="text" th:field="*{motor}" required>
-                    <div class="error" th:if="${#fields.hasErrors('motor')}" th:errors="*{motor}"></div>
-                </div>
-                <div class="field">
-                    <label for="renavam">Renavam</label>
-                    <input id="renavam" type="number" th:field="*{renavam}" required>
-                    <div class="error" th:if="${#fields.hasErrors('renavam')}" th:errors="*{renavam}"></div>
-                </div>
-                <div class="field">
-                    <label for="fipe">Tabela FIPE</label>
-                    <input id="fipe" type="number" th:field="*{fipe}" required>
-                    <div class="error" th:if="${#fields.hasErrors('fipe')}" th:errors="*{fipe}"></div>
-                </div>
-            </div>
-        </section>
+
         <div class="actions">
-            <button type="submit" class="btn btn--primary" th:text="${editing} ? 'Atualizar' : 'Salvar'">Salvar</button>
+            <button type="submit" class="btn btn--primary" th:text="${editing} ? 'Salvar' : 'Cadastrar'">Cadastrar</button>
             <a th:href="@{/usuarios/ui}" class="btn btn--ghost">Cancelar</a>
         </div>
     </form>
 </main>
-<footer class="footer">
-    <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Organização Mottu</p>
-</footer>
+
 </body>
 </html>

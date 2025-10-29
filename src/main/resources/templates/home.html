@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Organizador Mottu - Início</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body class="page">
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <h1 class="topbar__title">Organizador Mottu</h1>
+    <nav class="breadcrumbs">
+      <span class="breadcrumbs__current">Início</span>
+    </nav>
+  </div>
+</header>
+
+<main class="wrapper">
+
+  <section class="card hero">
+    <div class="hero__content">
+      <h2>Bem-vindo!</h2>
+      <p>Acesse rapidamente as principais ações do sistema.</p>
+      <div class="hero__actions">
+        <a th:href="@{/usuarios/ui/novo}" class="btn btn--primary">Criar Usuário</a>
+        <a th:href="@{/usuarios/ui}" class="btn btn--ghost">Listar Funcionários</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <a th:href="@{/usuarios/ui/novo}" class="card card--link">
+      <h3>Cadastro</h3>
+      <p>Cadastre um novo usuário no sistema.</p>
+    </a>
+
+    <a th:href="@{/usuarios/ui}" class="card card--link">
+      <h3>Lista de Funcionários</h3>
+      <p>Veja, edite e gerencie os registros existentes.</p>
+    </a>
+  </section>
+
+</main>
+
+</body>
+</html>

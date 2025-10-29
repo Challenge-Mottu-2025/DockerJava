@@ -13,9 +13,9 @@
     <div class="topbar__inner">
         <h1 class="topbar__title">Usuários</h1>
         <nav class="breadcrumbs">
-            <a th:href="@{/usuarios/ui}" class="breadcrumbs__link">Lista</a>
+            <a th:href="@{/home}" class="breadcrumbs__link">Início</a>
             <span class="breadcrumbs__sep">/</span>
-            <span class="breadcrumbs__current">Início</span>
+            <span class="breadcrumbs__current">Lista</span>
         </nav>
     </div>
 </header>
@@ -70,20 +70,12 @@
                 </tbody>
             </table>
         </div>
-
         <div class="empty-state" th:if="${#lists.size(usuarios) == 0}">
-            <div class="empty-state__icon" aria-hidden="true">🗂️</div>
-            <h2 class="empty-state__title">Nenhum usuário cadastrado</h2>
-            <p class="empty-state__text">Comece adicionando o primeiro registro.</p>
-            <a th:href="@{/usuarios/ui/novo}" class="btn btn--primary">Cadastrar Usuário</a>
+            Nenhum usuário encontrado.
         </div>
     </div>
 
 </main>
-
-<footer class="footer">
-    <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Organização Mottu</p>
-</footer>
 
 </body>
 </html>
