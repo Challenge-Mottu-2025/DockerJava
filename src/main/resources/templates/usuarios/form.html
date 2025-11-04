@@ -20,10 +20,10 @@
     </div>
 </header>
 <main class="wrapper">
-    <form th:action="${formAction}" 
-          th:object="${usuarioForm}" 
+    <form th:action="${formAction}"
+          th:object="${usuarioForm}"
           method="post" class="card form"
-          >
+    >
         <div th:if="${msg}" class="alert alert--success" th:text="${msg}"></div>
         <div th:if="${#fields.hasErrors()}" class="alert alert--error">
             <strong>Existem erros no formulário.</strong>
@@ -59,6 +59,14 @@
                     <input id="cep" type="number" th:field="*{cep}" placeholder="00000000" required>
                     <div class="error" th:if="${#fields.hasErrors('cep')}" th:errors="*{cep}"></div>
                 </div>
+
+                <!-- ADICIONADO: campo País (obrigatório no DTO) -->
+                <div class="field">
+                    <label for="pais">País</label>
+                    <input id="pais" type="text" th:field="*{pais}" placeholder="Brasil" required>
+                    <div class="error" th:if="${#fields.hasErrors('pais')}" th:errors="*{pais}"></div>
+                </div>
+
                 <div class="field">
                     <label for="logradouro">Logradouro</label>
                     <input id="logradouro" type="text" th:field="*{logradouro}" placeholder="Rua/Av.">
@@ -73,15 +81,61 @@
                     <label for="complemento">Complemento</label>
                     <input id="complemento" type="text" th:field="*{complemento}" placeholder="Complemento">
                 </div>
+
                 <div class="field">
                     <label for="cidade">Cidade</label>
                     <input id="cidade" type="text" th:field="*{cidade}" placeholder="Cidade">
                     <div class="error" th:if="${#fields.hasErrors('cidade')}" th:errors="*{cidade}"></div>
                 </div>
+
+                <!-- ADICIONADO: campo Bairro (obrigatório no DTO) -->
+                <div class="field">
+                    <label for="bairro">Bairro</label>
+                    <input id="bairro" type="text" th:field="*{bairro}" placeholder="Bairro" required>
+                    <div class="error" th:if="${#fields.hasErrors('bairro')}" th:errors="*{bairro}"></div>
+                </div>
+
                 <div class="field">
                     <label for="estado">Estado</label>
                     <input id="estado" type="text" th:field="*{estado}" placeholder="UF">
                     <div class="error" th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section__title">Moto</h2>
+            <div class="grid">
+                <div class="field">
+                    <label for="placa">Placa</label>
+                    <input id="placa" type="text" th:field="*{placa}" placeholder="ABC1234">
+                    <div class="error" th:if="${#fields.hasErrors('placa')}" th:errors="*{placa}"></div>
+                </div>
+                <div class="field">
+                    <label for="cpfMoto">CPF (dono da moto)</label>
+                    <input id="cpfMoto" type="text" th:field="*{cpfMoto}" placeholder="CPF do proprietário (opcional)">
+                    <small class="hint">Se vazio, usará o CPF do usuário.</small>
+                    <div class="error" th:if="${#fields.hasErrors('cpfMoto')}" th:errors="*{cpfMoto}"></div>
+                </div>
+                <div class="field">
+                    <label for="niv">NIV (chassi)</label>
+                    <input id="niv" type="text" th:field="*{niv}" placeholder="9BWZZZ377VT004251">
+                    <div class="error" th:if="${#fields.hasErrors('niv')}" th:errors="*{niv}"></div>
+                </div>
+                <div class="field">
+                    <label for="motor">Motor</label>
+                    <input id="motor" type="text" th:field="*{motor}" placeholder="Número do motor">
+                    <div class="error" th:if="${#fields.hasErrors('motor')}" th:errors="*{motor}"></div>
+                </div>
+                <div class="field">
+                    <label for="renavam">Renavam</label>
+                    <input id="renavam" type="number" th:field="*{renavam}" placeholder="12345678">
+                    <div class="error" th:if="${#fields.hasErrors('renavam')}" th:errors="*{renavam}"></div>
+                </div>
+                <div class="field">
+                    <label for="fipe">FIPE</label>
+                    <input id="fipe" type="number" th:field="*{fipe}" placeholder="9200">
+                    <div class="error" th:if="${#fields.hasErrors('fipe')}" th:errors="*{fipe}"></div>
                 </div>
             </div>
         </section>

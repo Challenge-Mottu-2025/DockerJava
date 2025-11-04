@@ -22,7 +22,7 @@ public class Usuario {
     )
     private String cpf;
 
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "NR_CEP", referencedColumnName = "NR_CEP", nullable = false)
     private Endereco endereco;
 
