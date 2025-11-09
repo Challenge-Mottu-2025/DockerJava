@@ -16,7 +16,8 @@ public class Funcionario extends RepresentationModel<Funcionario> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_MT_FUNCIONARIO")
-    @SequenceGenerator(name = "SEQ_MT_FUNCIONARIO", sequenceName = "SEQ_MT_FUNCIONARIO", allocationSize = 1)
+    // Ajuste: usar a sequência que existe no banco (criada pelas migrations)
+    @SequenceGenerator(name = "SEQ_MT_FUNCIONARIO", sequenceName = "SEQ_T_MT_FUNCIONARIO", allocationSize = 1)
     @Column(name = "ID_FUNCIONARIO")
     private Long id;
 
