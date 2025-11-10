@@ -455,4 +455,4 @@ Este software é distribuído "como está", sem garantias explícitas ou implíc
 
 ---
 
-> Dúvidas, sugestões ou melhorias: abra uma issue ou entre em contato com os desenvolvedores
+> Dúvidas, sugestões ou melhorias: abra uma issue ou entre em contato com os desenvolvedores.
